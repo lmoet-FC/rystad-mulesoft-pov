@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MuleSoft for Rystad Energy — A Point of View</title>
+  <style>
+    /* ── Reset & base ────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f7f8fa;
+      color: #1a1f36;
+      line-height: 1.7;
+    }
+
+    /* ── Typography helpers ──────────────────────────────── */
+    h1, h2, h3 { line-height: 1.25; font-weight: 700; }
+    p { color: #3d4468; }
+
+    /* ── Utility ─────────────────────────────────────────── */
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 2rem; }
+    .pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.85rem;
+      border-radius: 100px;
+    }
+    .pill-blue { background: #e8f0fe; color: #1a56db; }
+    .pill-teal { background: #d1faf5; color: #0d7a6e; }
+    .pill-orange { background: #fff0e0; color: #b45309; }
+
+    /* ── Nav ─────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e5e9f0;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      color: #1a1f36;
+    }
+    .nav-logo-dot {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00a1e0 0%, #0070d2 100%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-dot svg { width: 16px; height: 16px; fill: #fff; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #3d4468;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #0070d2; }
+    .nav-cta {
+      background: #0070d2;
+      color: #fff !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: #005fb2 !important; }
+
+    /* ── Hero ────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(140deg, #001f4d 0%, #003580 50%, #0056b3 100%);
+      color: #fff;
+      padding: 7rem 0 6rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 30%, rgba(0,160,220,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0,180,120,0.10) 0%, transparent 70%);
+    }
+    .hero-inner { position: relative; max-width: 760px; }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow-line {
+      width: 40px; height: 2px;
+      background: #00c3f5;
+    }
+    .hero-eyebrow span { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #7ec8f5; }
+    .hero h1 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-bottom: 1.5rem; color: #fff; }
+    .hero h1 span { color: #5bc8f5; }
+    .hero-sub { font-size: 1.15rem; color: rgba(255,255,255,0.78); max-width: 600px; margin-bottom: 2.5rem; }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: #00a1e0;
+      color: #fff;
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: #0082c4; transform: translateY(-1px); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.25);
+      transition: background 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+
+    /* ── Section shared ──────────────────────────────────── */
+    section { padding: 5rem 0; }
+    .section-header { text-align: center; margin-bottom: 3.5rem; }
+    .section-header h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); margin: 0.75rem 0 1rem; }
+    .section-header p { font-size: 1.05rem; max-width: 620px; margin: 0 auto; }
+
+    /* ── What is MuleSoft ────────────────────────────────── */
+    .what-is { background: #fff; }
+    .analogy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .analogy-card {
+      background: #f7f8fa;
+      border-radius: 14px;
+      padding: 2rem 1.75rem;
+      border: 1px solid #e5e9f0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .analogy-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.07); }
+    .analogy-icon {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 1.25rem;
+    }
+    .analogy-card h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+    .analogy-card p { font-size: 0.9rem; }
+
+    /* ── Pain points (Angle 1 & 2) ───────────────────────── */
+    .angle { background: #f7f8fa; }
+    .angle:nth-of-type(even) { background: #fff; }
+
+    .angle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) { .angle-grid { grid-template-columns: 1fr; } }
+
+    .angle-label { margin-bottom: 1rem; }
+    .angle-content h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); margin-bottom: 1rem; }
+    .angle-content > p { margin-bottom: 1.5rem; font-size: 1.02rem; }
+
+    .pain-list, .benefit-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .pain-list li, .benefit-list li {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      font-size: 0.95rem;
+    }
+    .pain-list li::before {
+      content: '✕';
+      color: #e03e3e;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+    .benefit-list li::before {
+      content: '✓';
+      color: #0d7a6e;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+
+    .angle-visual {
+      background: #fff;
+      border: 1px solid #e5e9f0;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .angle-visual.dark {
+      background: linear-gradient(135deg, #001f4d, #003580);
+      border: none;
+    }
+
+    /* ── Flow diagram ────────────────────────────────────── */
+    .flow { display: flex; flex-direction: column; gap: 0.5rem; }
+    .flow-node {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .flow-node.sys { background: #e8f0fe; color: #1a56db; }
+    .flow-node.dark-node { background: rgba(255,255,255,0.18); color: #fff; }
+    .flow-node.mule { background: #00a1e0; color: #fff; font-size: 0.82rem; letter-spacing: 0.05em; justify-content: center; }
+    .flow-arrow {
+      text-align: center;
+      color: #a0abc0;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    .flow-node .node-icon { font-size: 1.1rem; }
+    .flow-label {
+      font-size: 0.72rem;
+      color: #6b7280;
+      text-align: center;
+      font-style: italic;
+      margin-top: 0.25rem;
+    }
+
+    /* ── Before / After ──────────────────────────────────── */
+    .before-after { background: #001230; color: #fff; padding: 5rem 0; }
+    .before-after .section-header h2 { color: #fff; }
+    .before-after .section-header p { color: rgba(255,255,255,0.7); }
+
+    .ba-grid {
+      display: grid;
+      grid-template-columns: 1fr 80px 1fr;
+      gap: 0;
+      align-items: stretch;
+    }
+    @media (max-width: 768px) {
+      .ba-grid { grid-template-columns: 1fr; }
+      .ba-divider { display: none; }
+    }
+
+    .ba-card {
+      border-radius: 16px;
+      padding: 2.25rem;
+    }
+    .ba-card.before { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+    .ba-card.after  { background: rgba(0,161,224,0.15);   border: 1px solid rgba(0,161,224,0.3); }
+
+    .ba-card-title {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .ba-card.before .ba-card-title { color: #f87171; }
+    .ba-card.after  .ba-card-title { color: #34d399; }
+
+    .ba-divider {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ba-arrow {
+      width: 40px; height: 40px;
+      background: #00a1e0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 1.2rem;
+    }
+
+    /* Chaos diagram */
+    .chaos-diagram {
+      position: relative;
+      height: 220px;
+      margin-top: 1rem;
+    }
+    .chaos-node {
+      position: absolute;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      white-space: nowrap;
+    }
+    /* SVG lines between chaos nodes */
+    .chaos-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .chaos-line { stroke: rgba(255,80,80,0.35); stroke-width: 1.5; stroke-dasharray: 4 3; fill: none; }
+
+    /* Clean diagram */
+    .clean-diagram { display: flex; flex-direction: column; gap: 0; margin-top: 1rem; }
+    .clean-row {
+      display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.5rem;
+    }
+    .clean-node {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+    }
+    .mule-hub {
+      background: #00a1e0;
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.6rem 1.4rem;
+      border-radius: 10px;
+    }
+    .clean-arrows {
+      text-align: center; color: rgba(255,255,255,0.3); font-size: 0.85rem; margin: 0.25rem 0;
+    }
+
+    .ba-points { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; margin-top: 1.5rem; }
+    .ba-points li {
+      display: flex; align-items: flex-start; gap: 0.65rem;
+      font-size: 0.9rem; color: rgba(255,255,255,0.8);
+    }
+    .ba-points li .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 0.45rem;
+    }
+    .ba-card.before .dot { background: #f87171; }
+    .ba-card.after  .dot { background: #34d399; }
+
+    /* ── Outcome metrics ─────────────────────────────────── */
+    .outcomes { background: #fff; }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1.5rem;
+    }
+    .metric-card {
+      background: linear-gradient(135deg, #f0f7ff, #e8f4ff);
+      border: 1px solid #c7deff;
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      text-align: center;
+    }
+    .metric-card .metric-num {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #0070d2;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .metric-card .metric-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #3d4468;
+    }
+    .metric-card .metric-sub {
+      font-size: 0.78rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+
+    /* ── CTA ─────────────────────────────────────────────── */
+    .cta-section {
+      background: linear-gradient(135deg, #00a1e0, #0056b3);
+      color: #fff;
+      padding: 5rem 0;
+      text-align: center;
+    }
+    .cta-section h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); color: #fff; margin-bottom: 1rem; }
+    .cta-section p { color: rgba(255,255,255,0.85); font-size: 1.1rem; max-width: 560px; margin: 0 auto 2.5rem; }
+    .cta-actions { display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; align-items: center; }
+    .cta-link {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: rgba(255,255,255,0.5);
+      transition: text-decoration-color 0.2s;
+    }
+    .cta-link:hover { text-decoration-color: #fff; }
+    .cta-link-secondary {
+      color: rgba(255,255,255,0.8);
+      font-weight: 500;
+      font-size: 1rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: rgba(255,255,255,0.3);
+      transition: color 0.2s, text-decoration-color 0.2s;
+    }
+    .cta-link-secondary:hover { color: #fff; text-decoration-color: #fff; }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    footer {
+      background: #0d1526;
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.82rem;
+    }
+    footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    footer a:hover { color: #fff; }
+
+    /* ── Divider ─────────────────────────────────────────── */
+    .section-rule {
+      border: none;
+      border-top: 1px solid #e5e9f0;
+      margin: 0;
+    }
+
+    /* ── Responsive nav ──────────────────────────────────── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─────────────────── NAV ─────────────────── -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">
+      <span class="nav-logo-dot">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </span>
+      MuleSoft for Rystad Energy
+    </a>
+    <ul class="nav-links">
+      <li><a href="#what-is">What is MuleSoft</a></li>
+      <li><a href="#migration">System Migration</a></li>
+      <li><a href="#finance">Finance Integration</a></li>
+      <li><a href="#vision">The Vision</a></li>
+      <li><a href="#cta" class="nav-cta">Let's Talk</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ─────────────────── HERO ─────────────────── -->
+<section class="hero" id="top">
+  <div class="container hero-inner">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span>MuleSoft Point of View — Rystad Energy</span>
+    </div>
+    <h1>Your systems have a lot to say.<br/><span>It's time they started talking.</span></h1>
+    <p class="hero-sub">
+      Rystad Energy runs on world-class data and people. But when your CRM, billing, support, and finance tools don't communicate, your team fills the gaps manually — every day. There's a better way.
+    </p>
+    <div class="hero-actions">
+      <a href="#what-is" class="btn-primary">See how it works →</a>
+      <a href="#cta" class="btn-ghost">Book a discovery session</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── WHAT IS MULESOFT ─────────────────── -->
+<section class="what-is" id="what-is">
+  <div class="container">
+    <div class="section-header">
+      <span class="pill pill-blue">The Basics</span>
+      <h2>What exactly is MuleSoft?</h2>
+      <p>
+        Every modern company runs on a dozen different tools. The problem isn't the tools — it's the space between them. MuleSoft is the platform that closes that gap.
+      </p>
+    </div>
+
+    <div style="max-width:760px; margin: 0 auto 3rem; background:#f0f7ff; border-radius:16px; padding:2rem 2.5rem; border-left: 4px solid #00a1e0;">
+      <p style="font-size:1.1rem; color:#1a1f36; font-style:italic; line-height:1.8;">
+        "Think of MuleSoft as the central nervous system for your business software. Your CRM, your billing platform, your support desk, your finance tools — they're all organs doing their job in isolation today. MuleSoft wires them together so information flows automatically, exactly when and where it's needed."
+      </p>
+    </div>
+
+    <div class="analogy-grid">
+      <div class="analogy-card">
+        <div class="analogy-icon" style="background:#e8f0fe;">🔌</div>
+        <h3>No more manual exports</h3>
+        <p>Data moves between systems automatically, without anyone copying from one screen and pasting into another.</p>
+      </div>
+      <div class="analogy-card">
+        <div class="analogy-icon" style="background:#d1faf5;">🔁</div>
+        <h3>Build once, reuse everywhere</h3>
+        <p>Every connection MuleSoft creates is a reusable API — meaning the next integration costs a fraction of the first.</p>
+      </div>
+      <div class="analogy-card">
+        <div class="analogy-icon" style="background:#fff0e0;">🛡️</div>
+        <h3>Governed &amp; secure by default</h3>
+        <p>Full visibility over what data moves, where it goes, and who has access — with enterprise-grade security throughout.</p>
+      </div>
+      <div class="analogy-card">
+        <div class="analogy-icon" style="background:#fce7f3;">⚡</div>
+        <h3>Real-time, not overnight</h3>
+        <p>Forget nightly batch jobs. When a deal closes in Salesforce, your billing system knows in seconds — not tomorrow morning.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule" />
+
+<!-- ─────────────────── ANGLE 1: MIGRATION ─────────────────── -->
+<section class="angle" id="migration" style="background:#f7f8fa;">
+  <div class="container">
+    <div class="angle-grid">
+      <!-- Content -->
+      <div class="angle-content">
+        <div class="angle-label">
+          <span class="pill pill-blue">Challenge 1 — System Consolidation</span>
+        </div>
+        <h2>From fragmented tools to a single source of truth</h2>
+        <p>
+          Today, Rystad Energy runs its commercial operations across SugarCRM, Outlook, Freshdesk, Excel, and Chargebee. Each team has found ways to make it work — but the friction is real. Client Services often works almost entirely outside the CRM, which means deals, renewals, and client interactions live in inboxes and spreadsheets rather than in a shared system.
+        </p>
+
+        <p style="margin-bottom: 1rem; font-weight: 600; color: #1a1f36;">What this looks like today:</p>
+        <ul class="pain-list" style="margin-bottom:2rem;">
+          <li>Client interactions logged manually — or not at all</li>
+          <li>Renewal risk buried in email threads, not visible to leadership</li>
+          <li>Duplicated data entry across CRM, support desk, and billing</li>
+          <li>No single view of a customer across commercial and service teams</li>
+        </ul>
+
+        <p style="margin-bottom: 1rem; font-weight: 600; color: #1a1f36;">What MuleSoft makes possible:</p>
+        <ul class="benefit-list">
+          <li>SugarCRM data migrated cleanly into Salesforce with full history preserved</li>
+          <li>Freshdesk cases automatically linked to the right Salesforce account</li>
+          <li>A single, complete customer record accessible to every team</li>
+          <li>New integrations built in days, not months — using reusable API building blocks</li>
+        </ul>
+      </div>
+
+      <!-- Visual -->
+      <div>
+        <div class="angle-visual">
+          <p style="font-size:0.78rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#6b7280; margin-bottom:1.25rem;">Integration flow — Commercial operations</p>
+
+          <div class="flow">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+              <div class="flow-node sys"><span class="node-icon">🍬</span> SugarCRM</div>
+              <div class="flow-node sys"><span class="node-icon">📧</span> Outlook</div>
+              <div class="flow-node sys"><span class="node-icon">🎯</span> Freshdesk</div>
+              <div class="flow-node sys"><span class="node-icon">📊</span> Chargebee</div>
+            </div>
+            <div class="flow-arrow">↕ ↕ ↕ ↕</div>
+            <div class="flow-node mule">⚡ MuleSoft Integration Layer</div>
+            <div class="flow-arrow">↕</div>
+            <div class="flow-node sys" style="background:#e8f5e9; color:#1b5e20; justify-content:center; font-size:0.95rem;">
+              <span class="node-icon">☁️</span> Salesforce — Single Source of Truth
+            </div>
+          </div>
+
+          <p class="flow-label">All systems connected, all data in sync — automatically</p>
+
+          <div style="margin-top:1.75rem; padding-top:1.5rem; border-top:1px solid #e5e9f0;">
+            <p style="font-size:0.82rem; color:#3d4468; line-height:1.7;">
+              <strong>Migration note:</strong> MuleSoft handles the heavy lifting of moving historical SugarCRM data into Salesforce — transforming, cleansing, and mapping records — while keeping both systems live during the transition.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-rule" />
+
+<!-- ─────────────────── ANGLE 2: FINANCE ─────────────────── -->
+<section class="angle" id="finance" style="background:#fff;">
+  <div class="container">
+    <div class="angle-grid" style="direction:rtl;">
+      <!-- Visual (appears first on desktop due to rtl trick) -->
+      <div style="direction:ltr;">
+        <div class="angle-visual dark">
+          <p style="font-size:0.78rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.8); margin-bottom:1.25rem;">Finance integration — Chargebee → Revenue Cloud</p>
+
+          <div class="flow">
+            <div class="flow-node dark-node"><span class="node-icon">💳</span> Chargebee — Subscriptions &amp; Payments</div>
+            <div class="flow-arrow" style="color:rgba(255,255,255,0.55);">↕</div>
+            <div class="flow-node mule">⚡ MuleSoft — Real-time Sync</div>
+            <div class="flow-arrow" style="color:rgba(255,255,255,0.55);">↕</div>
+            <div class="flow-node dark-node"><span class="node-icon">💰</span> Salesforce Revenue Cloud</div>
+          </div>
+
+          <div style="margin-top:1.75rem; display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div style="background:rgba(255,255,255,0.14); border-radius:10px; padding:1rem; text-align:center;">
+              <div style="font-size:1.6rem; font-weight:800; color:#5bc8f5;">Live</div>
+              <div style="font-size:0.78rem; color:rgba(255,255,255,0.9); margin-top:0.25rem;">ARR visibility</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.14); border-radius:10px; padding:1rem; text-align:center;">
+              <div style="font-size:1.6rem; font-weight:800; color:#34d399;">Auto</div>
+              <div style="font-size:0.78rem; color:rgba(255,255,255,0.9); margin-top:0.25rem;">Renewal alerts</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.14); border-radius:10px; padding:1rem; text-align:center;">
+              <div style="font-size:1.6rem; font-weight:800; color:#f59e0b;">0</div>
+              <div style="font-size:0.78rem; color:rgba(255,255,255,0.9); margin-top:0.25rem;">Manual exports</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.14); border-radius:10px; padding:1rem; text-align:center;">
+              <div style="font-size:1.6rem; font-weight:800; color:#c084fc;">Real-time</div>
+              <div style="font-size:0.78rem; color:rgba(255,255,255,0.9); margin-top:0.25rem;">Payment status</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="angle-content" style="direction:ltr;">
+        <div class="angle-label">
+          <span class="pill pill-teal">Challenge 2 — Finance Visibility</span>
+        </div>
+        <h2>Live financial data where your team actually works</h2>
+        <p>
+          Right now, there's no live connection between Chargebee — where subscriptions are managed — and Salesforce, where your commercial team tracks relationships and renewals. The result? ARR figures depend on manual Excel exports, payment status is always slightly out of date, and finance and sales are never quite working from the same numbers.
+        </p>
+
+        <p style="margin-bottom: 1rem; font-weight: 600; color: #1a1f36;">The status quo costs you:</p>
+        <ul class="pain-list" style="margin-bottom:2rem;">
+          <li>Hours spent every week reconciling Chargebee exports with CRM records</li>
+          <li>Renewal risk invisible until someone manually checks Chargebee</li>
+          <li>Delayed revenue recognition from data that's days or weeks stale</li>
+          <li>Finance and sales teams operating on different versions of the truth</li>
+        </ul>
+
+        <p style="margin-bottom: 1rem; font-weight: 600; color: #1a1f36;">With MuleSoft connecting Chargebee to Revenue Cloud:</p>
+        <ul class="benefit-list">
+          <li>Payment status and subscription changes flow into Salesforce in real time</li>
+          <li>ARR, MRR, and churn figures are always current — no reconciliation needed</li>
+          <li>Upcoming renewals trigger automatic alerts to the right account owner</li>
+          <li>Finance and sales work from a single, authoritative revenue picture</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── BEFORE / AFTER ─────────────────── -->
+<section class="before-after" id="vision">
+  <div class="container">
+    <div class="section-header">
+      <span class="pill" style="background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.8);">The Transformation</span>
+      <h2>Before MuleSoft. After MuleSoft.</h2>
+      <p>The difference isn't just technical — it's how your team experiences every working day.</p>
+    </div>
+
+    <div class="ba-grid">
+      <!-- BEFORE -->
+      <div class="ba-card before">
+        <div class="ba-card-title">
+          <span>✕</span> Today — Disconnected by default
+        </div>
+
+        <!-- Chaos diagram -->
+        <div class="chaos-diagram">
+          <svg class="chaos-svg">
+            <!-- Lines between nodes (approximate centres) -->
+            <line class="chaos-line" x1="65"  y1="25"  x2="240" y2="25"  />
+            <line class="chaos-line" x1="65"  y1="25"  x2="180" y2="105" />
+            <line class="chaos-line" x1="65"  y1="25"  x2="50"  y2="140" />
+            <line class="chaos-line" x1="65"  y1="25"  x2="230" y2="165" />
+            <line class="chaos-line" x1="240" y1="25"  x2="180" y2="105" />
+            <line class="chaos-line" x1="240" y1="25"  x2="50"  y2="140" />
+            <line class="chaos-line" x1="240" y1="25"  x2="230" y2="165" />
+            <line class="chaos-line" x1="180" y1="105" x2="50"  y2="140" />
+            <line class="chaos-line" x1="180" y1="105" x2="230" y2="165" />
+            <line class="chaos-line" x1="50"  y1="140" x2="230" y2="165" />
+            <line class="chaos-line" x1="65"  y1="25"  x2="130" y2="185" />
+            <line class="chaos-line" x1="240" y1="25"  x2="130" y2="185" />
+            <line class="chaos-line" x1="130" y1="185" x2="50"  y2="140" />
+          </svg>
+          <div class="chaos-node" style="top:8px;  left:20px;">SugarCRM</div>
+          <div class="chaos-node" style="top:8px;  left:175px;">Outlook</div>
+          <div class="chaos-node" style="top:88px; left:130px;">Freshdesk</div>
+          <div class="chaos-node" style="top:122px;left:10px;">Chargebee</div>
+          <div class="chaos-node" style="top:148px;left:172px;">Excel</div>
+          <div class="chaos-node" style="top:168px;left:82px;">Finance<br/>Reports</div>
+        </div>
+
+        <ul class="ba-points">
+          <li><span class="dot"></span>Point-to-point connections break whenever a system changes</li>
+          <li><span class="dot"></span>Manual data entry is the integration strategy</li>
+          <li><span class="dot"></span>No single system owns the truth about a customer</li>
+          <li><span class="dot"></span>Finance visibility depends on someone running an export</li>
+          <li><span class="dot"></span>Onboarding new tools means months of custom work</li>
+        </ul>
+      </div>
+
+      <!-- Divider arrow -->
+      <div class="ba-divider">
+        <div class="ba-arrow">→</div>
+      </div>
+
+      <!-- AFTER -->
+      <div class="ba-card after">
+        <div class="ba-card-title">
+          <span>✓</span> Tomorrow — Connected by design
+        </div>
+
+        <!-- Clean hub diagram -->
+        <div class="clean-diagram" style="padding:1rem 0;">
+          <div class="clean-row">
+            <div class="clean-node">SugarCRM / Salesforce</div>
+            <div class="clean-node">Freshdesk</div>
+            <div class="clean-node">Chargebee</div>
+            <div class="clean-node">Outlook</div>
+          </div>
+          <div class="clean-arrows">↕ &nbsp; ↕ &nbsp; ↕ &nbsp; ↕</div>
+          <div class="clean-row" style="justify-content:center;">
+            <div class="clean-node mule-hub">⚡ MuleSoft Anypoint Platform</div>
+          </div>
+          <div class="clean-arrows">↕</div>
+          <div class="clean-row" style="justify-content:center;">
+            <div class="clean-node" style="background:rgba(52,211,153,0.15); border-color:rgba(52,211,153,0.4); color:#d1faf5;">☁️ Salesforce — Revenue Cloud · Service Cloud · Sales Cloud</div>
+          </div>
+        </div>
+
+        <ul class="ba-points">
+          <li><span class="dot"></span>Every system connects through a single, governed integration layer</li>
+          <li><span class="dot"></span>Data flows automatically — zero manual reconciliation</li>
+          <li><span class="dot"></span>Salesforce becomes the definitive record for every customer</li>
+          <li><span class="dot"></span>Live ARR, payment status, and renewal dates always visible</li>
+          <li><span class="dot"></span>Future integrations built in days using reusable API assets</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── OUTCOMES ─────────────────── -->
+<section class="outcomes">
+  <div class="container">
+    <div class="section-header">
+      <span class="pill pill-teal">Why It Matters</span>
+      <h2>The business case in plain numbers</h2>
+      <p>These are the kinds of outcomes Salesforce customers achieve after implementing MuleSoft as their integration backbone.</p>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-num">74%</div>
+        <div class="metric-label">Faster integration delivery</div>
+        <div class="metric-sub">Using reusable API assets vs. custom point-to-point code</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">3×</div>
+        <div class="metric-label">More integrations shipped</div>
+        <div class="metric-sub">Per developer, per year — freeing IT to focus on innovation</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">~40%</div>
+        <div class="metric-label">Reduction in manual data work</div>
+        <div class="metric-sub">Hours saved weekly by eliminating manual exports and re-keying</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">1</div>
+        <div class="metric-label">Source of customer truth</div>
+        <div class="metric-sub">Salesforce becomes the single authoritative view for every team</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────── CTA ─────────────────── -->
+<section class="cta-section" id="cta">
+  <div class="container">
+    <span class="pill" style="background:rgba(255,255,255,0.15); color:#fff; margin-bottom:1.25rem; display:inline-block;">Next Steps</span>
+    <h2>Ready to see this come to life for Rystad?</h2>
+    <p>
+      Great to connect at Agentforce World Tour Oslo. If any of this resonates, I'd love to run a focused discovery session — walking through your current landscape, mapping the biggest integration pain points, and showing you a live proof of concept tailored to Rystad's environment.
+    </p>
+    <div class="cta-actions">
+      <a href="mailto:lmoet@salesforce.com?subject=MuleSoft Discovery Session — Rystad Energy" class="cta-link">
+        Book a discovery session
+      </a>
+      <a href="mailto:lmoet@salesforce.com?subject=MuleSoft POV — Rystad Energy" class="cta-link-secondary">
+        Ask a question
+      </a>
+    </div>
+
+    <p style="margin-top:2.5rem; font-size:0.82rem; color:rgba(255,255,255,0.55);">
+      Laurens Moet · MuleSoft Solutions Engineer, Salesforce Norway · <a href="mailto:lmoet@salesforce.com" style="color:rgba(255,255,255,0.7);">lmoet@salesforce.com</a>
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────────── FOOTER ─────────────────── -->
+<footer>
+  <p>
+    © 2026 Salesforce, Inc. · This document is a Point of View prepared for Rystad Energy. ·
+    <a href="https://www.mulesoft.com" target="_blank" rel="noopener">mulesoft.com</a>
+  </p>
+</footer>
+
+</body>
+</html>
